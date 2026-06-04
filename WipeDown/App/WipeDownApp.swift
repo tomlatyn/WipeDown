@@ -65,16 +65,19 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         let hostingView = NSHostingView(rootView: view)
         
         let win = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 460, height: 520),
+            contentRect: NSRect(x: 0, y: 0, width: 540, height: 620),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
         
-        win.minSize = NSSize(width: 420, height: 520)
+        win.minSize = NSSize(width: 500, height: 600)
         win.maxSize = NSSize(width: 800, height: 1000)
         
         win.title = "WipeDown"
+        win.titlebarAppearsTransparent = false
+        win.backgroundColor = .windowBackgroundColor
+        win.isOpaque = true
         win.contentView = hostingView
         win.center()
         win.isReleasedWhenClosed = false

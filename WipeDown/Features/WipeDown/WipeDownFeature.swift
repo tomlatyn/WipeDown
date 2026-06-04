@@ -57,7 +57,7 @@ enum WipeDownFeature {
                let combination = UnlockCombination(rawValue: savedCombination) {
                 selectedCombination = combination
             } else {
-                selectedCombination = .escReturn
+                selectedCombination = .shifts
             }
         }
 
