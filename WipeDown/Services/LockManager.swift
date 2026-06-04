@@ -42,7 +42,7 @@ final class LockManager {
         guard !store.state.isLocked else { return }
         
         guard keyboardInterceptionPermissionGranted() else {
-            store.send(.lockStartFailed("Allow WipeDown in Input Monitoring before starting the lock."))
+            store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError)))
             requestKeyboardInterceptionPermission()
             return
         }
@@ -51,7 +51,7 @@ final class LockManager {
         pressedKeys.removeAll()
         
         guard startKeyboardInterception() else {
-            store.send(.lockStartFailed("Keyboard lock could not start. Check Input Monitoring permissions."))
+            store.send(.lockStartFailed(String(localized: .keyboardLockStartFailedError)))
             return
         }
         
@@ -540,21 +540,21 @@ private struct TestDimOverlayView: View {
                     .opacity(configuration.overlayOpacity)
                     .edgesIgnoringSafeArea(.all)
 
-                VStack(spacing: 24) {
+                VStack(spacing: AppTheme.Spacing.cardSpacing) {
                     ZStack {
                         Image(systemName: "display")
                             .font(.system(size: 36))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(Color.secondaryText)
                     }
 
-                    VStack(spacing: 8) {
-                        Text("Display dimming test is active.")
-                            .font(.system(size: 22, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white.opacity(0.9))
+                    VStack(spacing: AppTheme.Spacing.listGap) {
+                        Text(String(localized: .dimmingTestActive))
+                            .font(AppTheme.Fonts.testHeader)
+                            .foregroundColor(Color.primaryText)
 
-                        Text("Ends automatically in \(countdown) sec")
-                            .font(.system(size: 14, weight: .regular, design: .rounded))
-                            .foregroundColor(.white.opacity(0.4))
+                        Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
+                            .font(AppTheme.Fonts.displayRegular)
+                            .foregroundColor(Color.tertiaryText)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -576,22 +576,22 @@ private struct TestBlockOverlayView: View {
                 Color.black
                     .edgesIgnoringSafeArea(.all)
 
-                VStack(spacing: 24) {
+                VStack(spacing: AppTheme.Spacing.cardSpacing) {
                     Image(systemName: "keyboard")
                         .font(.system(size: 36))
-                        .foregroundColor(.white.opacity(0.6))
+                        .foregroundColor(Color.secondaryText)
 
-                    Text("Keyboard Block Testing")
-                        .font(.system(size: 22, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.9))
+                    Text(String(localized: .keyboardBlockTesting))
+                        .font(AppTheme.Fonts.testHeader)
+                        .foregroundColor(Color.primaryText)
 
-                    Text("All keypresses are blocked.")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundColor(.white.opacity(0.4))
+                    Text(String(localized: .allKeypressesBlocked))
+                        .font(AppTheme.Fonts.displayRegular)
+                        .foregroundColor(Color.tertiaryText)
 
-                    Text("Ends automatically in \(countdown) sec")
-                        .font(.system(size: 13, weight: .regular, design: .rounded))
-                        .foregroundColor(.white.opacity(0.4))
+                    Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
+                        .font(AppTheme.Fonts.displayMuted)
+                        .foregroundColor(Color.tertiaryText)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }

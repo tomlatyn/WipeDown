@@ -23,6 +23,14 @@ struct Effect<Action> {
     static func fireAndForget(_ work: @escaping () -> Void) -> Self {
         Self { _ in work() }
     }
+
+    func map<NewAction>(_ transform: @escaping (Action) -> NewAction) -> Effect<NewAction> {
+        Effect<NewAction> { send in
+            run { action in
+                send(transform(action))
+            }
+        }
+    }
 }
 
 final class Store<State, Action>: ObservableObject {
@@ -58,7 +66,11 @@ final class Store<State, Action>: ObservableObject {
     ) -> Binding<Value> {
         Binding(
             get: { get(self.state) },
-            set: { self.send(action($0)) }
+            set: { value in
+                DispatchQueue.main.async { [weak self] in
+                    self?.send(action(value))
+                }
+            }
         )
     }
 }

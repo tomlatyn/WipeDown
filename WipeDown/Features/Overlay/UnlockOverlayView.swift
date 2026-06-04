@@ -16,7 +16,7 @@ struct UnlockOverlayView: View {
                 .opacity(store.state.overlayOpacity)
                 .edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 24) {
+            VStack(spacing: AppTheme.Spacing.cardSpacing) {
                 ZStack {
                     Circle()
                         .trim(from: 0.0, to: CGFloat(store.state.unlockProgress))
@@ -30,28 +30,28 @@ struct UnlockOverlayView: View {
                     
                     if store.state.unlockProgress > 0 {
                         Text("\(Int(store.state.unlockProgress * 100))%")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .font(AppTheme.Fonts.displayTitle)
+                            .foregroundColor(Color.primaryText)
                             .transition(.scale.combined(with: .opacity))
                     } else {
                         Image(systemName: "keyboard.fill")
                             .font(.system(size: 36))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(Color.secondaryText)
                     }
                 }
                 
-                VStack(spacing: 8) {
+                VStack(spacing: AppTheme.Spacing.listGap) {
                     Text(store.state.unlockPrompt)
-                        .font(.system(size: 22, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.9))
+                        .font(AppTheme.Fonts.displaySemibold)
+                        .foregroundColor(Color.primaryText)
                     
-                    Text("WipeDown is active. Clean your keyboard and display.")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundColor(.white.opacity(0.4))
+                    Text(String(localized: .overlayActiveMessage))
+                        .font(AppTheme.Fonts.displayRegular)
+                        .foregroundColor(Color.tertiaryText)
                     
-                    Text("Ends automatically in \(store.state.remainingSafetyTimeText)")
-                        .font(.system(size: 13, weight: .regular, design: .rounded))
-                        .foregroundColor(.white.opacity(0.4))
+                    Text(String(localized: .overlayEndsAutomaticallyFormat(store.state.remainingSafetyTimeText)))
+                        .font(AppTheme.Fonts.displayMuted)
+                        .foregroundColor(Color.tertiaryText)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		E27579952FD09CBE0083199D /* WipeDownApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579852FD09CBE0083199D /* WipeDownApp.swift */; };
+		E27579962FD09CBF0083199D /* AppDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579872FD09CBE0083199F /* AppDefaults.swift */; };
+		E27579962FD09CBF0083199A /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579872FD09CBE0083199B /* AppTheme.swift */; };
 		E27579962FD09CBE0083199D /* ComposableArchitecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579872FD09CBE0083199D /* ComposableArchitecture.swift */; };
 		E27579972FD09CBE0083199D /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579892FD09CBE0083199D /* PreferencesView.swift */; };
 		E27579982FD09CBE0083199D /* UnlockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */; };
@@ -15,18 +17,48 @@
 		E275799A2FD09CBE0083199D /* LockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579902FD09CBE0083199D /* LockManager.swift */; };
 		E275799B2FD09CBE0083199D /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579922FD09CBE0083199D /* OverlayWindow.swift */; };
 		E275799C2FD09CBE0083199D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E275798E2FD09CBE0083199D /* Assets.xcassets */; };
+		E30000000000000000000030 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000130 /* Localizable.xcstrings */; };
+		E30000000000000000000001 /* LockSettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000101 /* LockSettingsFeature.swift */; };
+		E30000000000000000000002 /* PreferencesFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000102 /* PreferencesFeature.swift */; };
+		E30000000000000000000003 /* AppSettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000103 /* AppSettingsFeature.swift */; };
+		E30000000000000000000004 /* AboutFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000104 /* AboutFeature.swift */; };
+		E30000000000000000000006 /* LockSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000106 /* LockSettingsView.swift */; };
+		E30000000000000000000007 /* AppSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000107 /* AppSettingsView.swift */; };
+		E30000000000000000000008 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000108 /* AboutView.swift */; };
+		E30000000000000000000011 /* PreferencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000111 /* PreferencesSection.swift */; };
+		E30000000000000000000013 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000113 /* GlassCard.swift */; };
+		E30000000000000000000014 /* RowLayouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000114 /* RowLayouts.swift */; };
+		E30000000000000000000017 /* ToggleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000117 /* ToggleRow.swift */; };
+		E30000000000000000000018 /* ButtonRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000118 /* ButtonRow.swift */; };
+		E30000000000000000000019 /* SliderRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000119 /* SliderRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E27579852FD09CBE0083199D /* WipeDownApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WipeDownApp.swift; sourceTree = "<group>"; };
+		E27579872FD09CBE0083199F /* AppDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDefaults.swift; sourceTree = "<group>"; };
+		E27579872FD09CBE0083199B /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		E27579872FD09CBE0083199D /* ComposableArchitecture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposableArchitecture.swift; sourceTree = "<group>"; };
 		E27579892FD09CBE0083199D /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockOverlayView.swift; sourceTree = "<group>"; };
 		E275798B2FD09CBE0083199D /* WipeDownFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WipeDownFeature.swift; sourceTree = "<group>"; };
 		E275798E2FD09CBE0083199D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E30000000000000000000130 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E27579902FD09CBE0083199D /* LockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockManager.swift; sourceTree = "<group>"; };
 		E27579922FD09CBE0083199D /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		E2AB24D12FD0803F000A4ACB /* WipeDown.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WipeDown.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E30000000000000000000101 /* LockSettingsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSettingsFeature.swift; sourceTree = "<group>"; };
+		E30000000000000000000102 /* PreferencesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesFeature.swift; sourceTree = "<group>"; };
+		E30000000000000000000103 /* AppSettingsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsFeature.swift; sourceTree = "<group>"; };
+		E30000000000000000000104 /* AboutFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutFeature.swift; sourceTree = "<group>"; };
+		E30000000000000000000106 /* LockSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSettingsView.swift; sourceTree = "<group>"; };
+		E30000000000000000000107 /* AppSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsView.swift; sourceTree = "<group>"; };
+		E30000000000000000000108 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		E30000000000000000000111 /* PreferencesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSection.swift; sourceTree = "<group>"; };
+		E30000000000000000000113 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		E30000000000000000000114 /* RowLayouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowLayouts.swift; sourceTree = "<group>"; };
+		E30000000000000000000117 /* ToggleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleRow.swift; sourceTree = "<group>"; };
+		E30000000000000000000118 /* ButtonRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonRow.swift; sourceTree = "<group>"; };
+		E30000000000000000000119 /* SliderRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,24 +84,21 @@
 			isa = PBXGroup;
 			children = (
 				E27579872FD09CBE0083199D /* ComposableArchitecture.swift */,
+				E27579872FD09CBE0083199F /* AppDefaults.swift */,
+				E27579872FD09CBE0083199B /* AppTheme.swift */,
 			);
 			path = Core;
-			sourceTree = "<group>";
-		};
-		E275798C2FD09CBE0083199D /* WipeDown */ = {
-			isa = PBXGroup;
-			children = (
-				E27579892FD09CBE0083199D /* PreferencesView.swift */,
-				E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */,
-				E275798B2FD09CBE0083199D /* WipeDownFeature.swift */,
-			);
-			path = WipeDown;
 			sourceTree = "<group>";
 		};
 		E275798D2FD09CBE0083199D /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				E275798C2FD09CBE0083199D /* WipeDown */,
+				E30100000000000000000001 /* Root */,
+				E30100000000000000000002 /* Preferences */,
+				E30100000000000000000003 /* LockSettings */,
+				E30100000000000000000004 /* AppSettings */,
+				E30100000000000000000005 /* About */,
+				E30100000000000000000006 /* Overlay */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -78,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				E275798E2FD09CBE0083199D /* Assets.xcassets */,
+				E30000000000000000000130 /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -94,6 +124,12 @@
 			isa = PBXGroup;
 			children = (
 				E27579922FD09CBE0083199D /* OverlayWindow.swift */,
+				E30000000000000000000111 /* PreferencesSection.swift */,
+				E30000000000000000000113 /* GlassCard.swift */,
+				E30000000000000000000114 /* RowLayouts.swift */,
+				E30000000000000000000117 /* ToggleRow.swift */,
+				E30000000000000000000118 /* ButtonRow.swift */,
+				E30000000000000000000119 /* SliderRow.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -125,6 +161,58 @@
 				E2AB24D12FD0803F000A4ACB /* WipeDown.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000001 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				E275798B2FD09CBE0083199D /* WipeDownFeature.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000002 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				E30000000000000000000102 /* PreferencesFeature.swift */,
+				E27579892FD09CBE0083199D /* PreferencesView.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000003 /* LockSettings */ = {
+			isa = PBXGroup;
+			children = (
+				E30000000000000000000101 /* LockSettingsFeature.swift */,
+				E30000000000000000000106 /* LockSettingsView.swift */,
+			);
+			path = LockSettings;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000004 /* AppSettings */ = {
+			isa = PBXGroup;
+			children = (
+				E30000000000000000000103 /* AppSettingsFeature.swift */,
+				E30000000000000000000107 /* AppSettingsView.swift */,
+			);
+			path = AppSettings;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000005 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				E30000000000000000000104 /* AboutFeature.swift */,
+				E30000000000000000000108 /* AboutView.swift */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
+		E30100000000000000000006 /* Overlay */ = {
+			isa = PBXGroup;
+			children = (
+				E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */,
+			);
+			path = Overlay;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -189,6 +277,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E275799C2FD09CBE0083199D /* Assets.xcassets in Resources */,
+				E30000000000000000000030 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,8 +289,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				E27579952FD09CBE0083199D /* WipeDownApp.swift in Sources */,
+				E27579962FD09CBF0083199D /* AppDefaults.swift in Sources */,
+				E27579962FD09CBF0083199A /* AppTheme.swift in Sources */,
 				E27579962FD09CBE0083199D /* ComposableArchitecture.swift in Sources */,
 				E27579972FD09CBE0083199D /* PreferencesView.swift in Sources */,
+				E30000000000000000000002 /* PreferencesFeature.swift in Sources */,
+				E30000000000000000000006 /* LockSettingsView.swift in Sources */,
+				E30000000000000000000011 /* PreferencesSection.swift in Sources */,
+				E30000000000000000000013 /* GlassCard.swift in Sources */,
+				E30000000000000000000014 /* RowLayouts.swift in Sources */,
+				E30000000000000000000017 /* ToggleRow.swift in Sources */,
+				E30000000000000000000018 /* ButtonRow.swift in Sources */,
+				E30000000000000000000019 /* SliderRow.swift in Sources */,
+				E30000000000000000000001 /* LockSettingsFeature.swift in Sources */,
+				E30000000000000000000007 /* AppSettingsView.swift in Sources */,
+				E30000000000000000000003 /* AppSettingsFeature.swift in Sources */,
+				E30000000000000000000008 /* AboutView.swift in Sources */,
+				E30000000000000000000004 /* AboutFeature.swift in Sources */,
 				E27579982FD09CBE0083199D /* UnlockOverlayView.swift in Sources */,
 				E27579992FD09CBE0083199D /* WipeDownFeature.swift in Sources */,
 				E275799A2FD09CBE0083199D /* LockManager.swift in Sources */,
@@ -266,7 +370,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -324,7 +428,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
