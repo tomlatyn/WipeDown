@@ -26,6 +26,7 @@ enum WipeDownFeature {
         var unlockProgress = 0.0
         var remainingSafetyTime: TimeInterval = 0.0
         var statusMessage: String?
+        var needsInputMonitoringPermission = false
 
         init(defaults: UserDefaults = .standard, loginItemService: AppLoginItemServicing = AppLoginItemService.shared) {
             lockSettings = LockSettingsFeature.State(defaults: defaults)
@@ -95,8 +96,9 @@ enum WipeDownFeature {
         case about(AboutFeature.Action)
 
         case lockStarted
-        case lockStartFailed(String)
+        case lockStartFailed(String, isPermissionError: Bool = false)
         case lockStopped
+        case clearStatusMessage
         case setUnlockProgress(Double)
         case resetUnlockProgress
         case setRemainingSafetyTime(TimeInterval)
@@ -175,16 +177,23 @@ enum WipeDownFeature {
                 state.statusMessage = nil
                 return .none
 
-            case let .lockStartFailed(message):
+            case let .lockStartFailed(message, isPermissionError):
                 state.isLocked = false
                 state.remainingSafetyTime = 0.0
                 state.statusMessage = message
+                state.needsInputMonitoringPermission = isPermissionError
                 return .none
 
             case .lockStopped:
                 state.isLocked = false
                 state.unlockProgress = 0.0
                 state.remainingSafetyTime = 0.0
+                state.needsInputMonitoringPermission = false
+                return .none
+
+            case .clearStatusMessage:
+                state.statusMessage = nil
+                state.needsInputMonitoringPermission = false
                 return .none
 
             case let .setUnlockProgress(progress):

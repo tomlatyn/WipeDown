@@ -30,6 +30,12 @@ struct WipeDownApp: App {
                 store.send(.preferencesButtonTapped(store))
             }
         }
+
+        if !AXIsProcessTrusted() {
+            DispatchQueue.main.async {
+                store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError), isPermissionError: true))
+            }
+        }
     }
     
     var body: some Scene {

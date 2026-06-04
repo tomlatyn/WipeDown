@@ -5,11 +5,13 @@
 //  Created by Tomáš Latýn on 03.06.2026.
 //
 
+import Combine
 import SwiftUI
 
 struct PreferencesView: View {
     @ObservedObject var store: WipeDownStore
     private let sidebarWidth: CGFloat = 54
+    private let permissionTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 0) {
@@ -27,6 +29,12 @@ struct PreferencesView: View {
         .background(.ultraThinMaterial)
         .preferredColorScheme(.dark)
         .frame(minWidth: 580, idealWidth: 760, minHeight: 600)
+        .onReceive(permissionTimer) { _ in
+            guard store.state.needsInputMonitoringPermission else { return }
+            if AXIsProcessTrusted() {
+                store.send(.clearStatusMessage)
+            }
+        }
     }
 
     private var sidebar: some View {
@@ -72,7 +80,14 @@ struct PreferencesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.cardSpacing) {
                 if let statusMessage = store.state.statusMessage {
-                    StatusCard(message: statusMessage)
+                    StatusCard(
+                        message: statusMessage,
+                        actionTitle: store.state.needsInputMonitoringPermission ? String(localized: .openPrivacySettings) : nil,
+                        action: store.state.needsInputMonitoringPermission ? {
+                            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                        } : nil
+                    )
+                    .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
                 switch store.state.preferences.selectedScreen {
@@ -84,6 +99,7 @@ struct PreferencesView: View {
                     AboutView(store: store)
                 }
             }
+            .animation(.spring(duration: 0.35), value: store.state.statusMessage)
             .padding(.horizontal, AppTheme.Spacing.screenPaddingHorizontal)
             .padding(.top, AppTheme.Spacing.cardSpacing)
             .padding(.bottom, AppTheme.Spacing.cardSpacing)
@@ -126,13 +142,24 @@ struct PreferencesView: View {
 
 struct StatusCard: View {
     let message: String
+    var actionTitle: String? = nil
+    var action: (() -> Void)? = nil
 
     var body: some View {
         GlassCard {
             RowContainer {
-                Label(message, systemImage: "exclamationmark.triangle.fill")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.orange)
+                HStack(alignment: .center) {
+                    Label(message, systemImage: "exclamationmark.triangle.fill")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.orange)
+
+                    if let actionTitle, let action {
+                        Spacer()
+                        Button(actionTitle, action: action)
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                    }
+                }
             }
         }
     }

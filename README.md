@@ -23,14 +23,14 @@ WipeDown is a lightweight macOS menu bar utility that locks your screen and keyb
 ## Requirements
 
 - macOS 13.0 (Ventura) or later
-- **Input Monitoring permission** — required to intercept keyboard input system-wide. macOS will prompt you on first use. You can manage this in **System Settings → Privacy & Security → Input Monitoring**.
+- **Accessibility permission** — required to intercept keyboard input system-wide. macOS will prompt you on first launch.
 
 ## Installation
 
 1. Download the latest `.dmg` from the [Releases](../../releases) page.
 2. Open the `.dmg` and drag **WipeDown** into your Applications folder.
 3. Launch WipeDown from Applications — it will appear in your menu bar.
-4. On first lock, macOS will ask for Input Monitoring permission. Grant it and try again.
+4. On first launch, macOS will ask for Accessibility permission. Grant it in **System Settings → Privacy & Security → Accessibility**.
 
 ## Contributing
 

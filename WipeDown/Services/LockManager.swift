@@ -42,7 +42,7 @@ final class LockManager {
         guard !store.state.isLocked else { return }
         
         guard keyboardInterceptionPermissionGranted() else {
-            store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError)))
+            store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError), isPermissionError: true))
             requestKeyboardInterceptionPermission()
             return
         }
@@ -349,11 +349,12 @@ final class LockManager {
     }
     
     private func keyboardInterceptionPermissionGranted() -> Bool {
-        CGPreflightListenEventAccess()
+        AXIsProcessTrusted()
     }
-    
+
     private func requestKeyboardInterceptionPermission() {
-        _ = CGRequestListenEventAccess()
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+        AXIsProcessTrustedWithOptions(options)
     }
     
     private func installLifecycleObservers() {

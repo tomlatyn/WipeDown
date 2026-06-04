@@ -43,3 +43,7 @@ playground.xcworkspace
 *.swo
 *.tmp
 *.log
+
+# Built packages and installer scripts
+*.dmg
+build_dmg.command

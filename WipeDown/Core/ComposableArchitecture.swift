@@ -46,6 +46,8 @@ final class Store<State, Action>: ObservableObject {
         self.reducer = reducer
     }
 
+    deinit {}
+
     func send(_ action: Action) {
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in

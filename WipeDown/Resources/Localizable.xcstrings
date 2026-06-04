@@ -265,13 +265,24 @@
         }
       }
     },
+    "openPrivacySettings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Privacy Settings"
+          }
+        }
+      }
+    },
     "inputMonitoringPermissionError" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow WipeDown in Input Monitoring before starting the lock."
+            "value" : "Allow WipeDown in Accessibility before starting the lock."
           }
         }
       }
