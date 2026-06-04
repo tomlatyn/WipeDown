@@ -22,10 +22,17 @@ struct AboutView: View {
                 GlassCard {
                     RowContainer {
                         HStack(alignment: .center, spacing: AppTheme.Spacing.contentGap) {
-                            Image(systemName: "wand.and.stars")
-                                .font(.system(size: 32, weight: .semibold))
-                                .foregroundStyle(.blue)
-                                .frame(width: 44, height: 44)
+                            if let icon = NSImage(named: NSImage.applicationIconName) {
+                                Image(nsImage: icon)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 64, height: 64)
+                            } else {
+                                Image(systemName: "wand.and.stars")
+                                    .font(.system(size: 32, weight: .semibold))
+                                    .foregroundStyle(.blue)
+                                    .frame(width: 64, height: 64)
+                            }
 
                             VStack(alignment: .leading, spacing: AppTheme.Spacing.tiny) {
                                 Text(String(localized: .appName))
