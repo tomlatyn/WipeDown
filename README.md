@@ -42,4 +42,4 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-<p align="center">Made by <a href="https://github.com/xlatyn">Tomáš Latýn</a></p>
+<p align="center">Made by <a href="https://tomaslatyn.dev">Tomáš Latýn</a></p>
