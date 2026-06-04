@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="WipeDown/Resources/Assets.xcassets/AppIcon.appiconset/white-macOS-Default-512x512@1x.png" width="128" alt="WipeDown icon">
+  <img src="WipeDown/Resources/Assets.xcassets/AppIcon.appiconset/Icon-iOS-Default-512x512@1x.png" width="128" alt="WipeDown icon">
 </p>
 
 <h1 align="center">WipeDown</h1>
