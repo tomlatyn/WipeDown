@@ -40,6 +40,7 @@ enum LockSettingsFeature {
         static let defaultScreenBrightness = 0.1
 
         var dimScreen: Bool
+        var lockKeyboard: Bool
         var holdDuration: Double
         var safetyDuration: Double
         var selectedCombination: UnlockCombination
@@ -47,6 +48,7 @@ enum LockSettingsFeature {
 
         init(defaults: UserDefaults = .standard) {
             dimScreen = defaults.bool(forKey: AppDefaults.Keys.dimScreen)
+            lockKeyboard = defaults.bool(forKey: AppDefaults.Keys.lockKeyboard)
             holdDuration = defaults.double(forKey: AppDefaults.Keys.holdDuration)
             safetyDuration = Self.clampedSafetyDuration(defaults.double(forKey: AppDefaults.Keys.safetyDuration))
 
@@ -103,6 +105,7 @@ enum LockSettingsFeature {
 
     enum Action {
         case setDimScreen(Bool)
+        case setLockKeyboard(Bool)
         case setSelectedCombination(UnlockCombination)
         case setHoldDuration(Double)
         case setSafetyDuration(Double)
@@ -120,6 +123,11 @@ enum LockSettingsFeature {
             case let .setDimScreen(value):
                 state.dimScreen = value
                 defaults.set(value, forKey: AppDefaults.Keys.dimScreen)
+                return .none
+
+            case let .setLockKeyboard(value):
+                state.lockKeyboard = value
+                defaults.set(value, forKey: AppDefaults.Keys.lockKeyboard)
                 return .none
 
             case let .setSelectedCombination(value):

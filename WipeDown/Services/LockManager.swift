@@ -40,22 +40,29 @@ final class LockManager {
         self.store = store
         
         guard !store.state.isLocked else { return }
-        
-        guard keyboardInterceptionPermissionGranted() else {
-            store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError), isPermissionError: true))
-            requestKeyboardInterceptionPermission()
-            return
+
+        let shouldLockKeyboard = store.state.lockKeyboard
+
+        if shouldLockKeyboard {
+            guard keyboardInterceptionPermissionGranted() else {
+                store.send(.lockStartFailed(String(localized: .inputMonitoringPermissionError), isPermissionError: true))
+                requestKeyboardInterceptionPermission()
+                return
+            }
         }
-        
+
         store.send(.lockStarted)
         pressedKeys.removeAll()
-        
-        guard startKeyboardInterception() else {
-            store.send(.lockStartFailed(String(localized: .keyboardLockStartFailedError)))
-            return
+
+        if shouldLockKeyboard {
+            guard startKeyboardInterception() else {
+                store.send(.lockStartFailed(String(localized: .keyboardLockStartFailedError)))
+                return
+            }
+
+            startTouchBarLock()
         }
-        
-        startTouchBarLock()
+
         startSafetyTimer()
         
         // 1. Save original presentation options and set kiosk mode
@@ -411,7 +418,10 @@ final class LockManager {
         window.onKeyUp = { [weak self] event in
             self?.handleKeyUp(keyCode: event.keyCode)
         }
-        
+        window.onFlagsChanged = { [weak self] event in
+            self?.handleFlagsChanged(keyCode: event.keyCode, shiftPressed: event.modifierFlags.contains(.shift))
+        }
+
         return window
     }
 

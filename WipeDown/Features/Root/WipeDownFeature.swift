@@ -38,6 +38,11 @@ enum WipeDownFeature {
             set { lockSettings.dimScreen = newValue }
         }
 
+        var lockKeyboard: Bool {
+            get { lockSettings.lockKeyboard }
+            set { lockSettings.lockKeyboard = newValue }
+        }
+
         var holdDuration: Double {
             get { lockSettings.holdDuration }
             set { lockSettings.holdDuration = newValue }

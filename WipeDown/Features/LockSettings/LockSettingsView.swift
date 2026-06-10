@@ -43,11 +43,26 @@ struct LockSettingsView: View {
                     RowDivider()
 
                     RowContainer {
-                        ButtonRow(
-                            title: String(localized: .testKeyboardLock),
-                            caption: String(localized: .testKeyboardLockCaption)
-                        ) {
-                            store.send(.lockSettings(.testKeyboardBlockTapped))
+                        ToggleRow(
+                            title: String(localized: .lockKeyboard),
+                            caption: String(localized: .lockKeyboardCaption),
+                            isOn: store.binding(
+                                get: { $0.lockSettings.lockKeyboard },
+                                send: { .lockSettings(.setLockKeyboard($0)) }
+                            )
+                        )
+                    }
+
+                    if store.state.lockSettings.lockKeyboard {
+                        RowDivider()
+
+                        RowContainer {
+                            ButtonRow(
+                                title: String(localized: .testKeyboardLock),
+                                caption: String(localized: .testKeyboardLockCaption)
+                            ) {
+                                store.send(.lockSettings(.testKeyboardBlockTapped))
+                            }
                         }
                     }
                 }

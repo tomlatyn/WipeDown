@@ -10,6 +10,7 @@ import AppKit
 final class OverlayWindow: NSWindow {
     var onKeyDown: ((NSEvent) -> Void)?
     var onKeyUp: ((NSEvent) -> Void)?
+    var onFlagsChanged: ((NSEvent) -> Void)?
     
     init(screen: NSScreen) {
         super.init(
@@ -62,6 +63,14 @@ final class OverlayWindow: NSWindow {
             onKeyUp(event)
         } else {
             super.keyUp(with: event)
+        }
+    }
+
+    override func flagsChanged(with event: NSEvent) {
+        if let onFlagsChanged = onFlagsChanged {
+            onFlagsChanged(event)
+        } else {
+            super.flagsChanged(with: event)
         }
     }
 }

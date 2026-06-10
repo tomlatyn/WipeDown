@@ -9,6 +9,7 @@ import Foundation
 
 enum AppDefaults {
     static let dimScreen = true
+    static let lockKeyboard = true
     static let holdDuration = 1.0
     static let safetyDuration = 120.0
     static let unlockCombination = UnlockCombination.shifts.rawValue
@@ -17,6 +18,7 @@ enum AppDefaults {
 
     enum Keys {
         static let dimScreen = "dimScreen"
+        static let lockKeyboard = "lockKeyboard"
         static let holdDuration = "holdDuration"
         static let safetyDuration = "safetyDuration"
         static let unlockCombination = "selectedCombination"
@@ -28,6 +30,7 @@ enum AppDefaults {
     static func register() {
         let defaults: [String: Any] = [
             Keys.dimScreen: dimScreen,
+            Keys.lockKeyboard: lockKeyboard,
             Keys.holdDuration: holdDuration,
             Keys.safetyDuration: safetyDuration,
             Keys.unlockCombination: unlockCombination,

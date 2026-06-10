@@ -265,17 +265,6 @@
         }
       }
     },
-    "openPrivacySettings" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Privacy Settings"
-          }
-        }
-      }
-    },
     "inputMonitoringPermissionError" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -331,6 +320,28 @@
         }
       }
     },
+    "lockKeyboard" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock keyboard"
+          }
+        }
+      }
+    },
+    "lockKeyboardCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocks all keypresses while the lock is active."
+          }
+        }
+      }
+    },
     "menuPreferences" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -360,6 +371,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings..."
+          }
+        }
+      }
+    },
+    "openPrivacySettings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Privacy Settings"
           }
         }
       }
