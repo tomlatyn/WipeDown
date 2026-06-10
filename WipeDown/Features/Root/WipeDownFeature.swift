@@ -43,6 +43,16 @@ enum WipeDownFeature {
             set { lockSettings.lockKeyboard = newValue }
         }
 
+        var adjustKeyboardBacklight: Bool {
+            get { lockSettings.adjustKeyboardBacklight }
+            set { lockSettings.adjustKeyboardBacklight = newValue }
+        }
+
+        var keyboardBrightness: Double {
+            get { lockSettings.keyboardBrightness }
+            set { lockSettings.keyboardBrightness = newValue }
+        }
+
         var holdDuration: Double {
             get { lockSettings.holdDuration }
             set { lockSettings.holdDuration = newValue }

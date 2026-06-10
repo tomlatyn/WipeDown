@@ -81,6 +81,11 @@ final class LockManager {
             DisplayBrightnessController.shared.dimDisplay(targetBrightness: physicalDisplayBrightness(for: WipeDownFeature.State.defaultScreenBrightness))
         }
         
+        // 2b. Dim keyboard backlight if configured
+        if store.state.lockSettings.adjustKeyboardBacklight {
+            KeyboardBrightnessController.shared.dimKeyboard(targetBrightness: Float(store.state.lockSettings.keyboardBrightness))
+        }
+        
         // 3. Hide cursor
         NSCursor.hide()
         
@@ -91,6 +96,7 @@ final class LockManager {
     func stopWipeDown() {
         guard let store = store, store.state.isLocked, !isStopping else { return }
         let shouldRestoreDisplay = store.state.dimScreen
+        let shouldRestoreKeyboard = store.state.lockSettings.adjustKeyboardBacklight
         isStopping = true
         store.send(.lockStopped)
         
@@ -109,6 +115,9 @@ final class LockManager {
         // 4. Restore brightness settings
         if shouldRestoreDisplay {
             DisplayBrightnessController.shared.restoreDisplay()
+        }
+        if shouldRestoreKeyboard {
+            KeyboardBrightnessController.shared.restoreKeyboard()
         }
         
         // 5. Show cursor
@@ -535,6 +544,46 @@ final class LockManager {
             NSCursor.unhide()
         }
     }
+
+    func testKeyboardBacklight(
+        targetBrightness: Float,
+        completion: @escaping () -> Void
+    ) {
+        let endsAt = Date().addingTimeInterval(3.0)
+        var testWindows: [OverlayWindow] = []
+
+        let originalOptions = NSApp.presentationOptions
+        NSApp.presentationOptions = [
+            .hideDock,
+            .hideMenuBar,
+            .disableProcessSwitching,
+            .disableAppleMenu,
+            .disableForceQuit
+        ]
+
+        KeyboardBrightnessController.shared.dimKeyboard(targetBrightness: targetBrightness)
+        NSCursor.hide()
+
+        for screen in NSScreen.screens {
+            let window = OverlayWindow(screen: screen)
+            let view = TestKeyboardBacklightOverlayView(endsAt: endsAt)
+            window.contentView = NSHostingView(rootView: view)
+            window.makeKeyAndOrderFront(nil)
+            testWindows.append(window)
+        }
+        NSApp.activate(ignoringOtherApps: true)
+
+        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+            self.closeWindows(&testWindows)
+            KeyboardBrightnessController.shared.restoreKeyboard()
+            NSApp.presentationOptions = originalOptions
+            NSCursor.unhide()
+
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+    }
 }
 
 // MARK: - Display Dim Test Helper View
@@ -602,6 +651,38 @@ private struct TestBlockOverlayView: View {
 
                     Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
                         .font(AppTheme.Fonts.displayMuted)
+                        .foregroundColor(Color.tertiaryText)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - Keyboard Backlight Test Helper View
+private struct TestKeyboardBacklightOverlayView: View {
+    let endsAt: Date
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1.0)) { context in
+            let countdown = max(0, Int(ceil(endsAt.timeIntervalSince(context.date))))
+
+            ZStack {
+                Color.black
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: AppTheme.Spacing.cardSpacing) {
+                    Image(systemName: "keyboard.fill")
+                        .font(.system(size: 36))
+                        .foregroundColor(Color.secondaryText)
+
+                    Text(String(localized: .keyboardBacklightTestActive))
+                        .font(AppTheme.Fonts.testHeader)
+                        .foregroundColor(Color.primaryText)
+
+                    Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
+                        .font(AppTheme.Fonts.displayRegular)
                         .foregroundColor(Color.tertiaryText)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -727,6 +808,66 @@ private class DisplayBrightnessController {
         }
         setBrightness(original)
         print("WipeDown: Restored screen brightness to \(original)")
+        originalBrightness = nil
+    }
+}
+
+// MARK: - KeyboardBrightnessClientProtocol
+@objc private protocol KeyboardBrightnessClientProtocol {
+    @discardableResult
+    func setBrightness(_ brightness: Float, forKeyboard keyboardID: UInt64) -> Bool
+    func brightness(forKeyboard keyboardID: UInt64) -> Float
+}
+
+// MARK: - KeyboardBrightnessController
+private class KeyboardBrightnessController {
+    static let shared = KeyboardBrightnessController()
+    
+    private var brightnessClient: AnyObject?
+    private var originalBrightness: Float?
+    
+    private init() {
+        let path = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
+        guard let handle = dlopen(path, RTLD_LAZY) else {
+            print("WipeDown: Failed to load CoreBrightness dynamically")
+            return
+        }
+        
+        if let clientClass = NSClassFromString("KeyboardBrightnessClient") as? NSObject.Type {
+            brightnessClient = clientClass.init()
+        } else {
+            print("WipeDown: Failed to get KeyboardBrightnessClient class")
+        }
+    }
+    
+    func getBrightness() -> Float? {
+        guard let client = brightnessClient else { return nil }
+        return client.brightness?(forKeyboard: 1)
+    }
+    
+    func setBrightness(_ level: Float) {
+        guard let client = brightnessClient else { return }
+        _ = client.setBrightness?(level, forKeyboard: 1)
+    }
+    
+    func dimKeyboard(targetBrightness: Float) {
+        guard let current = getBrightness() else {
+            print("WipeDown: Could not read keyboard brightness")
+            return
+        }
+        originalBrightness = current
+        print("WipeDown: Saved original keyboard brightness: \(current) -> Dimming to \(targetBrightness)")
+        
+        setBrightness(targetBrightness)
+    }
+    
+    func restoreKeyboard() {
+        guard let original = originalBrightness else {
+            print("WipeDown: No original keyboard brightness saved, skipping restore")
+            return
+        }
+        setBrightness(original)
+        print("WipeDown: Restored keyboard brightness to \(original)")
         originalBrightness = nil
     }
 }

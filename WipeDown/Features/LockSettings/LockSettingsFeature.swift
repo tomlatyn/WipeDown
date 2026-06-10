@@ -41,14 +41,19 @@ enum LockSettingsFeature {
 
         var dimScreen: Bool
         var lockKeyboard: Bool
+        var adjustKeyboardBacklight: Bool
+        var keyboardBrightness: Double
         var holdDuration: Double
         var safetyDuration: Double
         var selectedCombination: UnlockCombination
         var isTestingScreenDim = false
+        var isTestingKeyboardBacklight = false
 
         init(defaults: UserDefaults = .standard) {
             dimScreen = defaults.bool(forKey: AppDefaults.Keys.dimScreen)
             lockKeyboard = defaults.bool(forKey: AppDefaults.Keys.lockKeyboard)
+            adjustKeyboardBacklight = defaults.bool(forKey: AppDefaults.Keys.adjustKeyboardBacklight)
+            keyboardBrightness = defaults.double(forKey: AppDefaults.Keys.keyboardBrightness)
             holdDuration = defaults.double(forKey: AppDefaults.Keys.holdDuration)
             safetyDuration = Self.clampedSafetyDuration(defaults.double(forKey: AppDefaults.Keys.safetyDuration))
 
@@ -58,6 +63,10 @@ enum LockSettingsFeature {
             } else {
                 selectedCombination = .shifts
             }
+        }
+
+        var keyboardBrightnessText: String {
+            String(format: "%d%%", Int(keyboardBrightness * 100))
         }
 
         var holdDurationText: String {
@@ -106,12 +115,16 @@ enum LockSettingsFeature {
     enum Action {
         case setDimScreen(Bool)
         case setLockKeyboard(Bool)
+        case setAdjustKeyboardBacklight(Bool)
+        case setKeyboardBrightness(Double)
         case setSelectedCombination(UnlockCombination)
         case setHoldDuration(Double)
         case setSafetyDuration(Double)
         case testScreenDimTapped
         case testScreenDimFinished
         case testKeyboardBlockTapped
+        case testKeyboardBacklightTapped
+        case testKeyboardBacklightFinished
     }
 
     static func reducer(
@@ -128,6 +141,16 @@ enum LockSettingsFeature {
             case let .setLockKeyboard(value):
                 state.lockKeyboard = value
                 defaults.set(value, forKey: AppDefaults.Keys.lockKeyboard)
+                return .none
+
+            case let .setAdjustKeyboardBacklight(value):
+                state.adjustKeyboardBacklight = value
+                defaults.set(value, forKey: AppDefaults.Keys.adjustKeyboardBacklight)
+                return .none
+
+            case let .setKeyboardBrightness(value):
+                state.keyboardBrightness = value
+                defaults.set(value, forKey: AppDefaults.Keys.keyboardBrightness)
                 return .none
 
             case let .setSelectedCombination(value):
@@ -166,6 +189,20 @@ enum LockSettingsFeature {
                 return .fireAndForget {
                     lockManager.testKeyboardBlock()
                 }
+
+            case .testKeyboardBacklightTapped:
+                guard !state.isTestingKeyboardBacklight else { return .none }
+                state.isTestingKeyboardBacklight = true
+                let targetBrightness = Float(state.keyboardBrightness)
+                return Effect { send in
+                    lockManager.testKeyboardBacklight(targetBrightness: targetBrightness) {
+                        send(.testKeyboardBacklightFinished)
+                    }
+                }
+
+            case .testKeyboardBacklightFinished:
+                state.isTestingKeyboardBacklight = false
+                return .none
             }
         }
     }

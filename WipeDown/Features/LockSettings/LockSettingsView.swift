@@ -65,6 +65,55 @@ struct LockSettingsView: View {
                             }
                         }
                     }
+
+                    RowDivider()
+
+                    RowContainer {
+                        ToggleRow(
+                            title: String(localized: .keyboardBacklight),
+                            caption: String(localized: .keyboardBacklightCaption),
+                            isOn: store.binding(
+                                get: { $0.lockSettings.adjustKeyboardBacklight },
+                                send: { .lockSettings(.setAdjustKeyboardBacklight($0)) }
+                            )
+                        )
+                    }
+
+                    if store.state.lockSettings.adjustKeyboardBacklight {
+                        RowDivider()
+
+                        RowContainer {
+                            SliderRow(
+                                title: String(localized: .keyboardBrightness),
+                                valueText: store.state.lockSettings.keyboardBrightnessText,
+                                caption: String(localized: .keyboardBrightnessCaption)
+                            ) {
+                                Slider(
+                                    value: store.binding(
+                                        get: { $0.lockSettings.keyboardBrightness },
+                                        send: { .lockSettings(.setKeyboardBrightness($0)) }
+                                    ),
+                                    in: 0.0...1.0,
+                                    step: 0.1
+                                )
+                                .onChange(of: store.state.lockSettings.keyboardBrightness) { _ in
+                                    performSliderHaptic()
+                                }
+                            }
+                        }
+
+                        RowDivider()
+
+                        RowContainer {
+                            ButtonRow(
+                                title: String(localized: .testKeyboardBacklight),
+                                caption: String(localized: .testKeyboardBacklightCaption),
+                                isDisabled: store.state.lockSettings.isTestingKeyboardBacklight
+                            ) {
+                                store.send(.lockSettings(.testKeyboardBacklightTapped))
+                            }
+                        }
+                    }
                 }
             }
 

@@ -133,6 +133,50 @@
         }
       }
     },
+    "keyboardBacklight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard backlight"
+          }
+        }
+      }
+    },
+    "keyboardBacklightCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust the keyboard backlight brightness when the screen is locked."
+          }
+        }
+      }
+    },
+    "keyboardBrightness" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backlight brightness"
+          }
+        }
+      }
+    },
+    "keyboardBrightnessCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sets the keyboard backlight level during locking."
+          }
+        }
+      }
+    },
     "dimmingTestActive" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -646,6 +690,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blocks keyboard input for 3 seconds so you can verify the lock behavior."
+          }
+        }
+      }
+    },
+    "testKeyboardBacklight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Keyboard Backlight"
+          }
+        }
+      }
+    },
+    "testKeyboardBacklightCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview how the lock looks when keyboard backlight adjustment is enabled."
+          }
+        }
+      }
+    },
+    "keyboardBacklightTestActive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard backlight test is active."
           }
         }
       }
