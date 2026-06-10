@@ -78,5 +78,14 @@ enum AppTheme {
         
         /// Display Muted (13pt, regular, rounded) - Used for secondary timer count metadata labels inside lock overlays.
         static let displayMuted = Font.system(size: 13, weight: .regular, design: .rounded)
+        
+        /// Large overlay icon font (36pt, regular)
+        static let displayIcon = Font.system(size: 36)
+        
+        /// Fallback app placeholder icon font (32pt, semibold)
+        static let placeholderIcon = Font.system(size: 32, weight: .semibold)
+        
+        /// Footer prompt font (12pt, medium)
+        static let footerPrompt = Font.system(size: 12, weight: .medium)
     }
 }

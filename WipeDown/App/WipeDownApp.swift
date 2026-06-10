@@ -94,6 +94,7 @@ final class WipeDownAppDelegate: NSObject, NSApplicationDelegate {
 }
 
 // MARK: - PreferencesWindowController
+
 final class PreferencesWindowController: NSObject, NSWindowDelegate {
     static let shared = PreferencesWindowController()
     private var window: NSWindow?
@@ -104,7 +105,6 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
     func show(store: WipeDownStore) {
         self.store = store
         
-        // If window already exists, bring it to front
         if let window = window {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -134,7 +134,6 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
 
         self.window = win
         
-        // Refresh visibility now that the window is open
         AppVisibilityController.shared.apply(showMenuBarIcon: store.state.showMenuBarIcon)
         
         win.makeKeyAndOrderFront(nil)
@@ -142,10 +141,8 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
     }
     
     func windowWillClose(_ notification: Notification) {
-        // Release the window reference when closed to free resources
         self.window = nil
         
-        // Refresh visibility now that the window is closed
         if let store = store {
             AppVisibilityController.shared.apply(showMenuBarIcon: store.state.showMenuBarIcon)
         }

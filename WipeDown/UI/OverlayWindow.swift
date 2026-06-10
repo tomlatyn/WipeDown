@@ -20,7 +20,6 @@ final class OverlayWindow: NSWindow {
             defer: false
         )
         
-        // CGShieldingWindowLevel() is the highest level used for full screen blockers/screensavers
         self.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
         self.backgroundColor = .black
         self.alphaValue = 1.0
@@ -30,7 +29,6 @@ final class OverlayWindow: NSWindow {
         self.sharingType = .none
         self.animationBehavior = .none
         
-        // Ensure it fills the screen perfectly
         self.setFrame(screen.frame, display: true)
         self.isReleasedWhenClosed = false
     }

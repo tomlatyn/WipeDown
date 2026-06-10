@@ -13,8 +13,14 @@
 		E27579962FD09CBE0083199D /* ComposableArchitecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579872FD09CBE0083199D /* ComposableArchitecture.swift */; };
 		E27579972FD09CBE0083199D /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579892FD09CBE0083199D /* PreferencesView.swift */; };
 		E27579982FD09CBE0083199D /* UnlockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */; };
+		E27579982FD09CBE008319FA /* TestDimOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798A2FD09CBE008319FA /* TestDimOverlayView.swift */; };
+		E27579982FD09CBE008319FB /* TestBlockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798A2FD09CBE008319FB /* TestBlockOverlayView.swift */; };
+		E27579982FD09CBE008319FC /* TestKeyboardBacklightOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798A2FD09CBE008319FC /* TestKeyboardBacklightOverlayView.swift */; };
 		E27579992FD09CBE0083199D /* WipeDownFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275798B2FD09CBE0083199D /* WipeDownFeature.swift */; };
 		E275799A2FD09CBE0083199D /* LockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579902FD09CBE0083199D /* LockManager.swift */; };
+		E275799A2FD09CBE008319FA /* LockTouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579902FD09CBE008319FA /* LockTouchBarController.swift */; };
+		E275799A2FD09CBE008319FB /* DisplayBrightnessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579902FD09CBE008319FB /* DisplayBrightnessController.swift */; };
+		E275799A2FD09CBE008319FC /* KeyboardBrightnessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579902FD09CBE008319FC /* KeyboardBrightnessController.swift */; };
 		E275799B2FD09CBE0083199D /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27579922FD09CBE0083199D /* OverlayWindow.swift */; };
 		E275799C2FD09CBE0083199D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E275798E2FD09CBE0083199D /* Assets.xcassets */; };
 		E30000000000000000000030 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000130 /* Localizable.xcstrings */; };
@@ -40,10 +46,16 @@
 		E27579872FD09CBE0083199D /* ComposableArchitecture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposableArchitecture.swift; sourceTree = "<group>"; };
 		E27579892FD09CBE0083199D /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockOverlayView.swift; sourceTree = "<group>"; };
+		E275798A2FD09CBE008319FA /* TestDimOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDimOverlayView.swift; sourceTree = "<group>"; };
+		E275798A2FD09CBE008319FB /* TestBlockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestBlockOverlayView.swift; sourceTree = "<group>"; };
+		E275798A2FD09CBE008319FC /* TestKeyboardBacklightOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestKeyboardBacklightOverlayView.swift; sourceTree = "<group>"; };
 		E275798B2FD09CBE0083199D /* WipeDownFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WipeDownFeature.swift; sourceTree = "<group>"; };
 		E275798E2FD09CBE0083199D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E30000000000000000000130 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E27579902FD09CBE0083199D /* LockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockManager.swift; sourceTree = "<group>"; };
+		E27579902FD09CBE008319FA /* LockTouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTouchBarController.swift; sourceTree = "<group>"; };
+		E27579902FD09CBE008319FB /* DisplayBrightnessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayBrightnessController.swift; sourceTree = "<group>"; };
+		E27579902FD09CBE008319FC /* KeyboardBrightnessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardBrightnessController.swift; sourceTree = "<group>"; };
 		E27579922FD09CBE0083199D /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		E2AB24D12FD0803F000A4ACB /* WipeDown.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WipeDown.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E30000000000000000000101 /* LockSettingsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSettingsFeature.swift; sourceTree = "<group>"; };
@@ -116,6 +128,9 @@
 			isa = PBXGroup;
 			children = (
 				E27579902FD09CBE0083199D /* LockManager.swift */,
+				E27579902FD09CBE008319FA /* LockTouchBarController.swift */,
+				E27579902FD09CBE008319FB /* DisplayBrightnessController.swift */,
+				E27579902FD09CBE008319FC /* KeyboardBrightnessController.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -211,6 +226,9 @@
 			isa = PBXGroup;
 			children = (
 				E275798A2FD09CBE0083199D /* UnlockOverlayView.swift */,
+				E275798A2FD09CBE008319FA /* TestDimOverlayView.swift */,
+				E275798A2FD09CBE008319FB /* TestBlockOverlayView.swift */,
+				E275798A2FD09CBE008319FC /* TestKeyboardBacklightOverlayView.swift */,
 			);
 			path = Overlay;
 			sourceTree = "<group>";
@@ -307,8 +325,14 @@
 				E30000000000000000000008 /* AboutView.swift in Sources */,
 				E30000000000000000000004 /* AboutFeature.swift in Sources */,
 				E27579982FD09CBE0083199D /* UnlockOverlayView.swift in Sources */,
+				E27579982FD09CBE008319FA /* TestDimOverlayView.swift in Sources */,
+				E27579982FD09CBE008319FB /* TestBlockOverlayView.swift in Sources */,
+				E27579982FD09CBE008319FC /* TestKeyboardBacklightOverlayView.swift in Sources */,
 				E27579992FD09CBE0083199D /* WipeDownFeature.swift in Sources */,
 				E275799A2FD09CBE0083199D /* LockManager.swift in Sources */,
+				E275799A2FD09CBE008319FA /* LockTouchBarController.swift in Sources */,
+				E275799A2FD09CBE008319FB /* DisplayBrightnessController.swift in Sources */,
+				E275799A2FD09CBE008319FC /* KeyboardBrightnessController.swift in Sources */,
 				E275799B2FD09CBE0083199D /* OverlayWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

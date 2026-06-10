@@ -35,7 +35,7 @@ struct UnlockOverlayView: View {
                             .transition(.scale.combined(with: .opacity))
                     } else {
                         Image(systemName: "keyboard.fill")
-                            .font(.system(size: 36))
+                            .font(AppTheme.Fonts.displayIcon)
                             .foregroundColor(Color.secondaryText)
                     }
                 }

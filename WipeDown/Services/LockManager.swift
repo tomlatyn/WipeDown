@@ -8,34 +8,39 @@
 import AppKit
 import SwiftUI
 
+// MARK: - Core Definition & Stored Properties
+
 final class LockManager {
     static let shared = LockManager()
     
-    private var windows: [OverlayWindow] = []
-    private var pressedKeys = Set<UInt16>()
-    private var unlockTimer: Timer?
-    private var safetyTimer: DispatchSourceTimer?
-    private var eventTap: CFMachPort?
-    private var eventTapSource: CFRunLoopSource?
-    private var localEventMonitor: Any?
-    private var touchBarController: LockTouchBarController?
-    private var notificationTokens: [NSObjectProtocol] = []
-    private var isStopping = false
-    private var lastTimerTick: Date?
-    private var safetyEndsAt: Date?
-    
-    private var originalPresentationOptions: NSApplication.PresentationOptions = []
-    
-    // Key codes
-    private let keyCodeEsc: UInt16 = 53
-    private let keyCodeReturn: UInt16 = 36
-    
     var store: WipeDownStore?
+    
+    var windows: [OverlayWindow] = []
+    var pressedKeys = Set<UInt16>()
+    var unlockTimer: Timer?
+    var safetyTimer: DispatchSourceTimer?
+    var eventTap: CFMachPort?
+    var eventTapSource: CFRunLoopSource?
+    var localEventMonitor: Any?
+    var touchBarController: LockTouchBarController?
+    var notificationTokens: [NSObjectProtocol] = []
+    var isStopping = false
+    var lastTimerTick: Date?
+    var safetyEndsAt: Date?
+    
+    var originalPresentationOptions: NSApplication.PresentationOptions = []
+    
+    let keyCodeEsc: UInt16 = 53
+    let keyCodeReturn: UInt16 = 36
     
     private init() {
         installLifecycleObservers()
     }
-    
+}
+
+// MARK: - Lock & Unlock Control
+
+extension LockManager {
     func startWipeDown(store: WipeDownStore) {
         self.store = store
         
@@ -65,7 +70,6 @@ final class LockManager {
 
         startSafetyTimer()
         
-        // 1. Save original presentation options and set kiosk mode
         originalPresentationOptions = NSApp.presentationOptions
         NSApp.presentationOptions = [
             .hideDock,
@@ -76,20 +80,16 @@ final class LockManager {
             .disableSessionTermination
         ]
         
-        // 2. Dim hardware screen if configured
         if store.state.dimScreen {
             DisplayBrightnessController.shared.dimDisplay(targetBrightness: physicalDisplayBrightness(for: WipeDownFeature.State.defaultScreenBrightness))
         }
         
-        // 2b. Dim keyboard backlight if configured
         if store.state.lockSettings.adjustKeyboardBacklight {
             KeyboardBrightnessController.shared.dimKeyboard(targetBrightness: Float(store.state.lockSettings.keyboardBrightness))
         }
         
-        // 3. Hide cursor
         NSCursor.hide()
         
-        // 4. Create full screen overlay windows on all connected screens
         showOverlayWindows(for: store)
     }
     
@@ -100,19 +100,15 @@ final class LockManager {
         isStopping = true
         store.send(.lockStopped)
         
-        // 1. Stop timer
         stopUnlockTimer()
         stopSafetyTimer()
         stopKeyboardInterception()
         stopTouchBarLock()
         
-        // 2. Close overlay windows
         closeOverlayWindows()
         
-        // 3. Restore presentation options
         NSApp.presentationOptions = originalPresentationOptions
         
-        // 4. Restore brightness settings
         if shouldRestoreDisplay {
             DisplayBrightnessController.shared.restoreDisplay()
         }
@@ -120,7 +116,6 @@ final class LockManager {
             KeyboardBrightnessController.shared.restoreKeyboard()
         }
         
-        // 5. Show cursor
         NSCursor.unhide()
         
         isStopping = false
@@ -136,7 +131,11 @@ final class LockManager {
             NSCursor.unhide()
         }
     }
-    
+}
+
+// MARK: - Keyboard Interception & Event Handling
+
+extension LockManager {
     private func handleKeyDown(keyCode: UInt16) {
         guard store?.state.isLocked == true else { return }
         
@@ -191,80 +190,6 @@ final class LockManager {
         guard keyCode == key1 || keyCode == key2 else { return }
         
         print("WipeDown: unlock key \(action): \(keyCode), pressed: \(pressedKeys.sorted())")
-    }
-    
-    private func startUnlockTimer() {
-        guard unlockTimer == nil else { return }
-        guard let store = self.store else { return }
-        
-        if store.state.holdDuration <= 0.0 {
-            stopWipeDown()
-            return
-        }
-        
-        lastTimerTick = Date()
-        
-        // Tick every 0.05 seconds for smooth progress updates
-        unlockTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            guard let store = self.store else { return }
-            
-            guard let lastTick = self.lastTimerTick else {
-                self.lastTimerTick = Date()
-                return
-            }
-            
-            let now = Date()
-            let timePassed = now.timeIntervalSince(lastTick)
-            self.lastTimerTick = now
-            
-            let increment = timePassed / store.state.holdDuration
-            let newProgress = min(store.state.unlockProgress + increment, 1.0)
-            
-            DispatchQueue.main.async {
-                store.send(.setUnlockProgress(newProgress))
-                if newProgress >= 1.0 {
-                    self.stopWipeDown()
-                }
-            }
-        }
-    }
-    
-    private func stopUnlockTimer() {
-        unlockTimer?.invalidate()
-        unlockTimer = nil
-        lastTimerTick = nil
-        
-        DispatchQueue.main.async {
-            self.store?.send(.resetUnlockProgress)
-        }
-    }
-    
-    private func startSafetyTimer() {
-        stopSafetyTimer()
-        
-        guard let store = store, store.state.safetyDuration > 0.0 else { return }
-        safetyEndsAt = Date().addingTimeInterval(store.state.safetyDuration)
-        
-        let timer = DispatchSource.makeTimerSource(queue: .main)
-        timer.schedule(deadline: .now(), repeating: 1.0, leeway: .milliseconds(100))
-        timer.setEventHandler { [weak self] in
-            guard let self = self, let store = self.store, let safetyEndsAt = self.safetyEndsAt else { return }
-            
-            let remaining = max(0.0, safetyEndsAt.timeIntervalSinceNow)
-            store.send(.setRemainingSafetyTime(remaining))
-            if remaining <= 0.0 {
-                self.stopWipeDown()
-            }
-        }
-        safetyTimer = timer
-        timer.resume()
-    }
-    
-    private func stopSafetyTimer() {
-        safetyTimer?.cancel()
-        safetyTimer = nil
-        safetyEndsAt = nil
     }
     
     private func startKeyboardInterception() -> Bool {
@@ -372,7 +297,88 @@ final class LockManager {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
     }
+}
+
+// MARK: - Timers
+
+extension LockManager {
+    private func startUnlockTimer() {
+        guard unlockTimer == nil else { return }
+        guard let store = self.store else { return }
+        
+        if store.state.holdDuration <= 0.0 {
+            stopWipeDown()
+            return
+        }
+        
+        lastTimerTick = Date()
+        
+        unlockTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            guard let store = self.store else { return }
+            
+            guard let lastTick = self.lastTimerTick else {
+                self.lastTimerTick = Date()
+                return
+            }
+            
+            let now = Date()
+            let timePassed = now.timeIntervalSince(lastTick)
+            self.lastTimerTick = now
+            
+            let increment = timePassed / store.state.holdDuration
+            let newProgress = min(store.state.unlockProgress + increment, 1.0)
+            
+            DispatchQueue.main.async {
+                store.send(.setUnlockProgress(newProgress))
+                if newProgress >= 1.0 {
+                    self.stopWipeDown()
+                }
+            }
+        }
+    }
     
+    private func stopUnlockTimer() {
+        unlockTimer?.invalidate()
+        unlockTimer = nil
+        lastTimerTick = nil
+        
+        DispatchQueue.main.async {
+            self.store?.send(.resetUnlockProgress)
+        }
+    }
+    
+    private func startSafetyTimer() {
+        stopSafetyTimer()
+        
+        guard let store = store, store.state.safetyDuration > 0.0 else { return }
+        safetyEndsAt = Date().addingTimeInterval(store.state.safetyDuration)
+        
+        let timer = DispatchSource.makeTimerSource(queue: .main)
+        timer.schedule(deadline: .now(), repeating: 1.0, leeway: .milliseconds(100))
+        timer.setEventHandler { [weak self] in
+            guard let self = self, let store = self.store, let safetyEndsAt = self.safetyEndsAt else { return }
+            
+            let remaining = max(0.0, safetyEndsAt.timeIntervalSinceNow)
+            store.send(.setRemainingSafetyTime(remaining))
+            if remaining <= 0.0 {
+                self.stopWipeDown()
+            }
+        }
+        safetyTimer = timer
+        timer.resume()
+    }
+    
+    private func stopSafetyTimer() {
+        safetyTimer?.cancel()
+        safetyTimer = nil
+        safetyEndsAt = nil
+    }
+}
+
+// MARK: - Lifecycle Observers
+
+extension LockManager {
     private func installLifecycleObservers() {
         let center = NotificationCenter.default
         let workspaceCenter = NSWorkspace.shared.notificationCenter
@@ -415,7 +421,11 @@ final class LockManager {
 
         showOverlayWindows(for: store)
     }
-    
+}
+
+// MARK: - Overlay Windows Management
+
+extension LockManager {
     private func makeOverlayWindow(for screen: NSScreen, store: WipeDownStore) -> OverlayWindow {
         let window = OverlayWindow(screen: screen)
         let contentView = NSHostingView(rootView: UnlockOverlayView(store: store))
@@ -456,6 +466,14 @@ final class LockManager {
         windows.removeAll()
     }
     
+    private func physicalDisplayBrightness(for overlayBrightness: Double) -> Float {
+        Float(max(0.08, overlayBrightness))
+    }
+}
+
+// MARK: - Touch Bar Control
+
+extension LockManager {
     private func startTouchBarLock() {
         touchBarController = LockTouchBarController()
         touchBarController?.start()
@@ -465,14 +483,11 @@ final class LockManager {
         touchBarController?.stop()
         touchBarController = nil
     }
-    
-    private func physicalDisplayBrightness(for overlayBrightness: Double) -> Float {
-        // Keep the panel lit enough for the unlock instructions and safety timer.
-        Float(max(0.08, overlayBrightness))
-    }
-    
-    // MARK: - Testing Controls
-    
+}
+
+// MARK: - Testing Controls
+
+extension LockManager {
     func testScreenDim(
         configuration: WipeDownFeature.TestOverlayConfiguration,
         completion: @escaping () -> Void
@@ -583,291 +598,5 @@ final class LockManager {
                 completion()
             }
         }
-    }
-}
-
-// MARK: - Display Dim Test Helper View
-private struct TestDimOverlayView: View {
-    let configuration: WipeDownFeature.TestOverlayConfiguration
-    let endsAt: Date
-
-    var body: some View {
-        TimelineView(.periodic(from: .now, by: 1.0)) { context in
-            let countdown = max(0, Int(ceil(endsAt.timeIntervalSince(context.date))))
-
-            ZStack {
-                Color.black
-                    .opacity(configuration.overlayOpacity)
-                    .edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: AppTheme.Spacing.cardSpacing) {
-                    ZStack {
-                        Image(systemName: "display")
-                            .font(.system(size: 36))
-                            .foregroundColor(Color.secondaryText)
-                    }
-
-                    VStack(spacing: AppTheme.Spacing.listGap) {
-                        Text(String(localized: .dimmingTestActive))
-                            .font(AppTheme.Fonts.testHeader)
-                            .foregroundColor(Color.primaryText)
-
-                        Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
-                            .font(AppTheme.Fonts.displayRegular)
-                            .foregroundColor(Color.tertiaryText)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-}
-
-// MARK: - Blocker Test Helper View
-private struct TestBlockOverlayView: View {
-    let endsAt: Date
-
-    var body: some View {
-        TimelineView(.periodic(from: .now, by: 1.0)) { context in
-            let countdown = max(0, Int(ceil(endsAt.timeIntervalSince(context.date))))
-
-            ZStack {
-                Color.black
-                    .edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: AppTheme.Spacing.cardSpacing) {
-                    Image(systemName: "keyboard")
-                        .font(.system(size: 36))
-                        .foregroundColor(Color.secondaryText)
-
-                    Text(String(localized: .keyboardBlockTesting))
-                        .font(AppTheme.Fonts.testHeader)
-                        .foregroundColor(Color.primaryText)
-
-                    Text(String(localized: .allKeypressesBlocked))
-                        .font(AppTheme.Fonts.displayRegular)
-                        .foregroundColor(Color.tertiaryText)
-
-                    Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
-                        .font(AppTheme.Fonts.displayMuted)
-                        .foregroundColor(Color.tertiaryText)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-}
-
-// MARK: - Keyboard Backlight Test Helper View
-private struct TestKeyboardBacklightOverlayView: View {
-    let endsAt: Date
-
-    var body: some View {
-        TimelineView(.periodic(from: .now, by: 1.0)) { context in
-            let countdown = max(0, Int(ceil(endsAt.timeIntervalSince(context.date))))
-
-            ZStack {
-                Color.black
-                    .edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: AppTheme.Spacing.cardSpacing) {
-                    Image(systemName: "keyboard.fill")
-                        .font(.system(size: 36))
-                        .foregroundColor(Color.secondaryText)
-
-                    Text(String(localized: .keyboardBacklightTestActive))
-                        .font(AppTheme.Fonts.testHeader)
-                        .foregroundColor(Color.primaryText)
-
-                    Text(String(localized: .endsAutomaticallySecondsFormat(countdown)))
-                        .font(AppTheme.Fonts.displayRegular)
-                        .foregroundColor(Color.tertiaryText)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-}
-
-// MARK: - LockTouchBarController
-private class LockTouchBarController: NSObject, NSTouchBarDelegate {
-    private let touchBar = NSTouchBar()
-    private let itemIdentifier = NSTouchBarItem.Identifier("com.latyn.WipeDown.lockedTouchBar")
-    private let systemTrayIdentifier = NSTouchBarItem.Identifier("com.latyn.WipeDown.lockedSystemTray")
-    private var isPresented = false
-    
-    override init() {
-        super.init()
-        touchBar.delegate = self
-        touchBar.defaultItemIdentifiers = [itemIdentifier]
-        touchBar.customizationIdentifier = NSTouchBar.CustomizationIdentifier("com.latyn.WipeDown.lockedTouchBar")
-    }
-    
-    func start() {
-        guard !isPresented else { return }
-        
-        presentSystemModalTouchBar()
-        isPresented = true
-    }
-    
-    func stop() {
-        guard isPresented else { return }
-        
-        dismissSystemModalTouchBar()
-        isPresented = false
-    }
-    
-    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
-        guard identifier == itemIdentifier else { return nil }
-        
-        let item = NSCustomTouchBarItem(identifier: identifier)
-        let view = NSView(frame: NSRect(x: 0, y: 0, width: 1085, height: 30))
-        view.wantsLayer = true
-        view.layer?.backgroundColor = NSColor.black.cgColor
-        item.view = view
-        return item
-    }
-    
-    private func presentSystemModalTouchBar() {
-        let selector = NSSelectorFromString("presentSystemModalFunctionBar:systemTrayItemIdentifier:")
-        guard NSTouchBar.responds(to: selector) else {
-            print("WipeDown: System modal Touch Bar API is not available")
-            return
-        }
-        
-        typealias PresentFunction = @convention(c) (AnyClass, Selector, NSTouchBar, NSTouchBarItem.Identifier) -> Void
-        let implementation = NSTouchBar.method(for: selector)
-        let function = unsafeBitCast(implementation, to: PresentFunction.self)
-        function(NSTouchBar.self, selector, touchBar, systemTrayIdentifier)
-    }
-    
-    private func dismissSystemModalTouchBar() {
-        let selector = NSSelectorFromString("dismissSystemModalFunctionBar:")
-        guard NSTouchBar.responds(to: selector) else { return }
-        
-        typealias DismissFunction = @convention(c) (AnyClass, Selector, NSTouchBar) -> Void
-        let implementation = NSTouchBar.method(for: selector)
-        let function = unsafeBitCast(implementation, to: DismissFunction.self)
-        function(NSTouchBar.self, selector, touchBar)
-    }
-}
-
-// MARK: - DisplayBrightnessController
-private class DisplayBrightnessController {
-    static let shared = DisplayBrightnessController()
-    
-    private var setBrightnessFunc: (@convention(c) (CGDirectDisplayID, Float) -> Int32)?
-    private var getBrightnessFunc: (@convention(c) (CGDirectDisplayID, UnsafeMutablePointer<Float>) -> Int32)?
-    private var originalBrightness: Float?
-    
-    private init() {
-        let path = "/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices"
-        guard let handle = dlopen(path, RTLD_LAZY) else {
-            print("WipeDown: Failed to load DisplayServices dynamically")
-            return
-        }
-        
-        if let setSym = dlsym(handle, "DisplayServicesSetBrightness") {
-            setBrightnessFunc = unsafeBitCast(setSym, to: (@convention(c) (CGDirectDisplayID, Float) -> Int32).self)
-        }
-        if let getSym = dlsym(handle, "DisplayServicesGetBrightness") {
-            getBrightnessFunc = unsafeBitCast(getSym, to: (@convention(c) (CGDirectDisplayID, UnsafeMutablePointer<Float>) -> Int32).self)
-        }
-    }
-    
-    func getBrightness() -> Float? {
-        guard let getFunc = getBrightnessFunc else { return nil }
-        var level: Float = 0.0
-        let result = getFunc(CGMainDisplayID(), &level)
-        return result == 0 ? level : nil
-    }
-    
-    func setBrightness(_ level: Float) {
-        guard let setFunc = setBrightnessFunc else { return }
-        _ = setFunc(CGMainDisplayID(), level)
-    }
-    
-    func dimDisplay(targetBrightness: Float) {
-        guard let current = getBrightness() else {
-            print("WipeDown: Could not read display brightness")
-            return
-        }
-        originalBrightness = current
-        print("WipeDown: Saved original screen brightness: \(current) -> Dimming to \(targetBrightness)")
-        
-        setBrightness(targetBrightness)
-    }
-    
-    func restoreDisplay() {
-        guard let original = originalBrightness else {
-            print("WipeDown: No original screen brightness saved, skipping restore")
-            return
-        }
-        setBrightness(original)
-        print("WipeDown: Restored screen brightness to \(original)")
-        originalBrightness = nil
-    }
-}
-
-// MARK: - KeyboardBrightnessClientProtocol
-@objc private protocol KeyboardBrightnessClientProtocol {
-    @discardableResult
-    func setBrightness(_ brightness: Float, forKeyboard keyboardID: UInt64) -> Bool
-    func brightness(forKeyboard keyboardID: UInt64) -> Float
-}
-
-// MARK: - KeyboardBrightnessController
-private class KeyboardBrightnessController {
-    static let shared = KeyboardBrightnessController()
-    
-    private var brightnessClient: AnyObject?
-    private var originalBrightness: Float?
-    
-    private init() {
-        let path = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
-        guard let handle = dlopen(path, RTLD_LAZY) else {
-            print("WipeDown: Failed to load CoreBrightness dynamically")
-            return
-        }
-        
-        if let clientClass = NSClassFromString("KeyboardBrightnessClient") as? NSObject.Type {
-            brightnessClient = clientClass.init()
-        } else {
-            print("WipeDown: Failed to get KeyboardBrightnessClient class")
-        }
-    }
-    
-    func getBrightness() -> Float? {
-        guard let client = brightnessClient else { return nil }
-        return client.brightness?(forKeyboard: 1)
-    }
-    
-    func setBrightness(_ level: Float) {
-        guard let client = brightnessClient else { return }
-        _ = client.setBrightness?(level, forKeyboard: 1)
-    }
-    
-    func dimKeyboard(targetBrightness: Float) {
-        guard let current = getBrightness() else {
-            print("WipeDown: Could not read keyboard brightness")
-            return
-        }
-        originalBrightness = current
-        print("WipeDown: Saved original keyboard brightness: \(current) -> Dimming to \(targetBrightness)")
-        
-        setBrightness(targetBrightness)
-    }
-    
-    func restoreKeyboard() {
-        guard let original = originalBrightness else {
-            print("WipeDown: No original keyboard brightness saved, skipping restore")
-            return
-        }
-        setBrightness(original)
-        print("WipeDown: Restored keyboard brightness to \(original)")
-        originalBrightness = nil
     }
 }

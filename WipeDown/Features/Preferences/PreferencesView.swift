@@ -59,7 +59,7 @@ struct PreferencesView: View {
             store.send(.preferences(.setSelectedScreen(screen)))
         } label: {
             Image(systemName: screen.systemImage)
-                .font(.system(size: 13, weight: .medium))
+                .font(AppTheme.Fonts.rowTitle)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppTheme.Spacing.listGap)
                 .contentShape(Rectangle())
@@ -111,7 +111,7 @@ struct PreferencesView: View {
         HStack(alignment: .center, spacing: AppTheme.Spacing.rowPaddingHorizontal) {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.tiny) {
                 Text("\(store.state.unlockPrompt).")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppTheme.Fonts.footerPrompt)
                     .foregroundStyle(Color.primaryText)
 
                 Text(String(localized: .safetyTimerFooterFormat(store.state.safetyDurationText)))
@@ -150,7 +150,7 @@ struct StatusCard: View {
             RowContainer {
                 HStack(alignment: .center) {
                     Label(message, systemImage: "exclamationmark.triangle.fill")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(AppTheme.Fonts.rowTitle)
                         .foregroundStyle(.orange)
 
                     if let actionTitle, let action {

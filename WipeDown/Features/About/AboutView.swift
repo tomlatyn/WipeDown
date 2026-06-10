@@ -29,7 +29,7 @@ struct AboutView: View {
                                     .frame(width: 64, height: 64)
                             } else {
                                 Image(systemName: "wand.and.stars")
-                                    .font(.system(size: 32, weight: .semibold))
+                                    .font(AppTheme.Fonts.placeholderIcon)
                                     .foregroundStyle(.blue)
                                     .frame(width: 64, height: 64)
                             }

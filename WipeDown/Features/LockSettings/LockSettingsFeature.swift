@@ -207,5 +207,3 @@ enum LockSettingsFeature {
         }
     }
 }
-
-
