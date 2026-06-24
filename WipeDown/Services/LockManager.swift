@@ -6,6 +6,8 @@
 //
 
 import AppKit
+import IOKit.hid
+import IOKit.hidsystem
 import SwiftUI
 
 // MARK: - Core Definition & Stored Properties
@@ -21,10 +23,12 @@ final class LockManager {
     var safetyTimer: DispatchSourceTimer?
     var eventTap: CFMachPort?
     var eventTapSource: CFRunLoopSource?
+    var hidManager: IOHIDManager?
     var localEventMonitor: Any?
     var touchBarController: LockTouchBarController?
     var notificationTokens: [NSObjectProtocol] = []
     var isStopping = false
+    var isKeyboardBlockTestActive = false
     var lastTimerTick: Date?
     var safetyEndsAt: Date?
     
@@ -151,16 +155,21 @@ extension LockManager {
         updateUnlockState()
     }
 
-    private func handleFlagsChanged(keyCode: UInt16, shiftPressed: Bool) {
+    private func handleFlagsChanged(keyCode: UInt16, modifierFlagsRawValue: UInt64) {
         guard store?.state.isLocked == true else { return }
 
         switch keyCode {
-        case 56, 60:
-            if shiftPressed {
+        case 56:
+            if modifierFlagsRawValue & UInt64(NX_DEVICELSHIFTKEYMASK) != 0 {
                 pressedKeys.insert(keyCode)
             } else {
-                pressedKeys.remove(56)
-                pressedKeys.remove(60)
+                pressedKeys.remove(keyCode)
+            }
+        case 60:
+            if modifierFlagsRawValue & UInt64(NX_DEVICERSHIFTKEYMASK) != 0 {
+                pressedKeys.insert(keyCode)
+            } else {
+                pressedKeys.remove(keyCode)
             }
         default:
             break
@@ -191,9 +200,14 @@ extension LockManager {
         
         print("WipeDown: unlock key \(action): \(keyCode), pressed: \(pressedKeys.sorted())")
     }
+
+    private var shouldBlockKeyboardInput: Bool {
+        store?.state.isLocked == true || isKeyboardBlockTestActive
+    }
     
     private func startKeyboardInterception() -> Bool {
         stopKeyboardInterception()
+        let hidCaptureStarted = startHIDKeyboardCapture()
         
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged, .systemDefined]) { [weak self] event in
             switch event.type {
@@ -202,7 +216,7 @@ extension LockManager {
             case .keyUp:
                 self?.handleKeyUp(keyCode: event.keyCode)
             case .flagsChanged:
-                self?.handleFlagsChanged(keyCode: event.keyCode, shiftPressed: event.modifierFlags.contains(.shift))
+                self?.handleFlagsChanged(keyCode: event.keyCode, modifierFlagsRawValue: UInt64(event.modifierFlags.rawValue))
             default:
                 break
             }
@@ -230,8 +244,11 @@ extension LockManager {
         
         guard let eventTap = eventTap else {
             print("WipeDown: Could not create keyboard event tap. Check Input Monitoring permissions.")
-            stopKeyboardInterception()
-            return false
+            if !hidCaptureStarted {
+                stopKeyboardInterception()
+                return false
+            }
+            return true
         }
         
         eventTapSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
@@ -258,11 +275,13 @@ extension LockManager {
         
         eventTapSource = nil
         eventTap = nil
+        stopHIDKeyboardCapture()
+        isKeyboardBlockTestActive = false
         pressedKeys.removeAll()
     }
     
     private func handleTappedEvent(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
-        guard store?.state.isLocked == true else {
+        guard shouldBlockKeyboardInput else {
             return Unmanaged.passUnretained(event)
         }
         
@@ -281,7 +300,7 @@ extension LockManager {
         case .keyUp:
             handleKeyUp(keyCode: keyCode)
         case .flagsChanged:
-            handleFlagsChanged(keyCode: keyCode, shiftPressed: event.flags.contains(.maskShift))
+            handleFlagsChanged(keyCode: keyCode, modifierFlagsRawValue: event.flags.rawValue)
         default:
             break
         }
@@ -296,6 +315,82 @@ extension LockManager {
     private func requestKeyboardInterceptionPermission() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
+    }
+
+    private func startHIDKeyboardCapture() -> Bool {
+        guard hidManager == nil else { return true }
+
+        let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
+        let matching: [[String: Any]] = [
+            [
+                kIOHIDDeviceUsagePageKey as String: kHIDPage_GenericDesktop,
+                kIOHIDDeviceUsageKey as String: kHIDUsage_GD_Keyboard
+            ],
+            [
+                kIOHIDDeviceUsagePageKey as String: kHIDPage_GenericDesktop,
+                kIOHIDDeviceUsageKey as String: kHIDUsage_GD_Keypad
+            ],
+            [
+                kIOHIDDeviceUsagePageKey as String: kHIDPage_GenericDesktop,
+                kIOHIDDeviceUsageKey as String: kHIDUsage_GD_SystemControl
+            ],
+            [
+                kIOHIDDeviceUsagePageKey as String: kHIDPage_Consumer,
+                kIOHIDDeviceUsageKey as String: kHIDUsage_Csmr_ConsumerControl
+            ]
+        ]
+
+        IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
+        IOHIDManagerRegisterInputValueCallback(manager, { context, result, _, value in
+            guard result == kIOReturnSuccess, let context else { return }
+            let manager = Unmanaged<LockManager>.fromOpaque(context).takeUnretainedValue()
+            manager.handleHIDValue(value)
+        }, Unmanaged.passUnretained(self).toOpaque())
+        IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
+
+        let result = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeSeizeDevice))
+        guard result == kIOReturnSuccess else {
+            IOHIDManagerUnscheduleFromRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
+            print("WipeDown: Could not seize HID keyboard devices. IOReturn: \(result)")
+            return false
+        }
+
+        hidManager = manager
+        return true
+    }
+
+    private func stopHIDKeyboardCapture() {
+        guard let manager = hidManager else { return }
+
+        IOHIDManagerRegisterInputValueCallback(manager, nil, nil)
+        IOHIDManagerUnscheduleFromRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
+        IOHIDManagerClose(manager, IOOptionBits(kIOHIDOptionsTypeNone))
+        hidManager = nil
+    }
+
+    private func handleHIDValue(_ value: IOHIDValue) {
+        guard shouldBlockKeyboardInput else { return }
+
+        let element = IOHIDValueGetElement(value)
+        guard IOHIDElementGetUsagePage(element) == kHIDPage_KeyboardOrKeypad else { return }
+        guard let keyCode = macVirtualKeyCode(forHIDUsage: IOHIDElementGetUsage(element)) else { return }
+
+        if IOHIDValueGetIntegerValue(value) == 0 {
+            handleKeyUp(keyCode: keyCode)
+        } else {
+            handleKeyDown(keyCode: keyCode)
+        }
+    }
+
+    private func macVirtualKeyCode(forHIDUsage usage: UInt32) -> UInt16? {
+        switch usage {
+        case 0x28: return keyCodeReturn
+        case 0x29: return keyCodeEsc
+        case 0x2C: return 49
+        case 0xE1: return 56
+        case 0xE5: return 60
+        default: return nil
+        }
     }
 }
 
@@ -438,7 +533,7 @@ extension LockManager {
             self?.handleKeyUp(keyCode: event.keyCode)
         }
         window.onFlagsChanged = { [weak self] event in
-            self?.handleFlagsChanged(keyCode: event.keyCode, shiftPressed: event.modifierFlags.contains(.shift))
+            self?.handleFlagsChanged(keyCode: event.keyCode, modifierFlagsRawValue: UInt64(event.modifierFlags.rawValue))
         }
 
         return window
@@ -533,6 +628,12 @@ extension LockManager {
     func testKeyboardBlock() {
         let endsAt = Date().addingTimeInterval(3.0)
         var testWindows: [OverlayWindow] = []
+        let keyboardInterceptionStarted = startKeyboardInterception()
+        isKeyboardBlockTestActive = keyboardInterceptionStarted
+
+        if !keyboardInterceptionStarted {
+            print("WipeDown: Keyboard block test could not start interception.")
+        }
 
         let originalOptions = NSApp.presentationOptions
         NSApp.presentationOptions = [
@@ -555,6 +656,7 @@ extension LockManager {
 
         Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
             self.closeWindows(&testWindows)
+            self.stopKeyboardInterception()
             NSApp.presentationOptions = originalOptions
             NSCursor.unhide()
         }
